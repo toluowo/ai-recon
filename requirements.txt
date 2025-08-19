@@ -1,0 +1,7 @@
+colorama
+tabulate
+python-dotenv
+python-whois
+shodan
+requests
+openai>=1.0.0

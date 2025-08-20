@@ -1,5 +1,9 @@
 # AI Recon (Hybrid: Mock + Real)
 
+![CI](https://github.com/toluowo/ai-recon/actions/workflows/ci.yml/badge.svg)
+
+AI-assisted, **offline-first** recon CLI that flips to real APIs when keys exist.
+
 AI‑assisted, **authorized** recon CLI that works **offline by default** and switches to **real APIs** if keys exist in `.env`.
 
 ## Features
@@ -11,11 +15,12 @@ AI‑assisted, **authorized** recon CLI that works **offline by default** and sw
 
 ## Quickstart
 ```bash
+git clone https://github.com/toluowo/ai-recon.git
+cd ai-recon
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
-# fill OPENAI_API_KEY and/or SHODAN_API_KEY
+cp .env.example .env   # fill OPENAI_API_KEY and/or SHODAN_API_KEY
 ```
 
 ## Usage

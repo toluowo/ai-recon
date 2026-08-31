@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
-from .evidence import Evidence
+from .evidence import Evidence, EvidenceStatus
 from .finding import Finding
 from .target import Target
 
@@ -27,6 +27,6 @@ class Assessment:
     @property
     def has_collection_errors(self) -> bool:
         return any(
-            item.status.value == "error"
+            item.status == EvidenceStatus.ERROR
             for item in self.evidence
         )

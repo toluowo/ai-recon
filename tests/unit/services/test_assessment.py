@@ -1,14 +1,41 @@
 from __future__ import annotations
 
+from ai_recon.analyzers import EvidenceAnalyzer
 from ai_recon.collectors import EvidenceCollector
 from ai_recon.models import (
     Assessment,
+    Confidence,
     Evidence,
     EvidenceMode,
     EvidenceStatus,
+    Finding,
+    Severity,
     Target,
 )
 from ai_recon.services.assessment import AssessmentService
+
+
+def make_finding(identifier: str = "TEST-001") -> Finding:
+    return Finding(
+        id=identifier,
+        title="Test finding",
+        severity=Severity.LOW,
+        confidence=Confidence.HIGH,
+        description="A finding created for testing.",
+        source="test",
+    )
+
+
+def make_whois_evidence() -> Evidence:
+    return Evidence(
+        source="whois",
+        target="example.com",
+        mode=EvidenceMode.LIVE,
+        status=EvidenceStatus.SUCCESS,
+        observations={
+            "domain_name": ["example.com"],
+        },
+    )
 
 
 class FakeCollector(EvidenceCollector):
@@ -40,6 +67,33 @@ class FakeCollector(EvidenceCollector):
                 else None
             ),
         )
+
+
+class FakeAnalyzer(EvidenceAnalyzer):
+    """Test analyzer that returns predefined findings."""
+
+    source = "whois"
+
+    def __init__(self, findings: list[Finding]) -> None:
+        self.findings = findings
+        self.calls: list[Evidence] = []
+
+    def analyze(self, evidence: Evidence) -> list[Finding]:
+        self.calls.append(evidence)
+        return self.findings
+
+
+class NonMatchingAnalyzer(EvidenceAnalyzer):
+    """Analyzer intentionally configured for another evidence source."""
+
+    source = "shodan"
+
+    def __init__(self) -> None:
+        self.calls: list[Evidence] = []
+
+    def analyze(self, evidence: Evidence) -> list[Finding]:
+        self.calls.append(evidence)
+        return []
 
 
 def test_create_assessment_returns_assessment_for_target() -> None:
@@ -114,3 +168,78 @@ def test_collect_evidence_preserves_error_evidence() -> None:
     assert evidence.status is EvidenceStatus.ERROR
     assert evidence.error == "Collection failed."
     assert assessment.has_collection_errors
+
+
+def test_analyze_evidence_executes_matching_analyzer() -> None:
+    finding = make_finding()
+    analyzer = FakeAnalyzer([finding])
+
+    service = AssessmentService(analyzers=[analyzer])
+
+    assessment = Assessment(
+        target=Target(identifier="example.com"),
+        evidence=[make_whois_evidence()],
+    )
+
+    result = service.analyze_evidence(assessment)
+
+    assert result is assessment
+    assert analyzer.calls == [assessment.evidence[0]]
+    assert assessment.findings == [finding]
+
+
+def test_analyze_evidence_ignores_non_matching_analyzer() -> None:
+    analyzer = NonMatchingAnalyzer()
+
+    service = AssessmentService(analyzers=[analyzer])
+
+    assessment = Assessment(
+        target=Target(identifier="example.com"),
+        evidence=[make_whois_evidence()],
+    )
+
+    result = service.analyze_evidence(assessment)
+
+    assert result is assessment
+    assert analyzer.calls == []
+    assert assessment.findings == []
+
+
+def test_analyze_evidence_adds_all_findings() -> None:
+    first_finding = make_finding("TEST-001")
+    second_finding = make_finding("TEST-002")
+
+    analyzer = FakeAnalyzer(
+        [
+            first_finding,
+            second_finding,
+        ]
+    )
+
+    service = AssessmentService(analyzers=[analyzer])
+
+    assessment = Assessment(
+        target=Target(identifier="example.com"),
+        evidence=[make_whois_evidence()],
+    )
+
+    service.analyze_evidence(assessment)
+
+    assert assessment.findings == [
+        first_finding,
+        second_finding,
+    ]
+
+
+def test_analyze_evidence_allows_empty_analyzer_configuration() -> None:
+    service = AssessmentService()
+
+    assessment = Assessment(
+        target=Target(identifier="example.com"),
+        evidence=[make_whois_evidence()],
+    )
+
+    result = service.analyze_evidence(assessment)
+
+    assert result is assessment
+    assert assessment.findings == []

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from ai_recon.analyzers import EvidenceAnalyzer
 from ai_recon.collectors import EvidenceCollector
 from ai_recon.models import Assessment, Target
 
@@ -12,8 +13,10 @@ class AssessmentService:
     def __init__(
         self,
         collectors: Sequence[EvidenceCollector] = (),
+        analyzers: Sequence[EvidenceAnalyzer] = (),
     ) -> None:
         self._collectors = collectors
+        self._analyzers = analyzers
 
     def create_assessment(self, target: Target) -> Assessment:
         """Create an assessment for a target."""
@@ -29,5 +32,23 @@ class AssessmentService:
         for collector in self._collectors:
             evidence = collector.collect(assessment.target)
             assessment.add_evidence(evidence)
+
+        return assessment
+
+    def analyze_evidence(
+        self,
+        assessment: Assessment,
+    ) -> Assessment:
+        """Analyze collected evidence with matching analyzers."""
+
+        for evidence in assessment.evidence:
+            for analyzer in self._analyzers:
+                if analyzer.source != evidence.source:
+                    continue
+
+                findings = analyzer.analyze(evidence)
+
+                for finding in findings:
+                    assessment.add_finding(finding)
 
         return assessment

@@ -48,4 +48,3 @@ AI-RECON interacts with external services and user-supplied targets. Security re
 Please avoid publicly disclosing a vulnerability until the project maintainer has had a reasonable opportunity to investigate and address the issue.
 
 Thank you for helping improve the security of AI-RECON.
-

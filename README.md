@@ -565,6 +565,30 @@ Cybersecurity professional focused on:
 
 ---
 
+## Versioning and Releases
+
+AI-RECON follows [Semantic Versioning](https://semver.org/).
+
+Version numbers use the format:
+
+```text
+MAJOR.MINOR.PATCH
+```
+Release changes are documented in CHANGELOG.md.
+
+Release tags use the format:
+
+vMAJOR.MINOR.PATCH
+
+For example:
+
+v0.2.0
+v0.2.1
+v0.3.0
+v1.0.0
+
+Tagged releases are automatically validated through the project's release workflow, including linting, formatting checks, type checking, automated tests, package building, and clean-environment installation verification.
+
 ## Contributing
 
 Contributions, ideas, and feedback are welcome.

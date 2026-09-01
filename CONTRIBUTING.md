@@ -41,6 +41,20 @@ ruff format --check .
 mypy src
 
 pytest -v
+
+rm -rf build dist
+
+python -m build
+
+git add pyproject.toml CHANGELOG.md
+
+git commit -m "chore(release): prepare v0.2.1"
+
+git tag -a v0.2.1 -m "Release v0.2.1"
+
+git push origin main
+
+git push origin v0.2.1
 ```
 
 All checks should pass before opening a pull request.
@@ -95,6 +109,95 @@ The project uses:
 
 Please keep new code compatible with the configured Python versions and maintain the existing typing standards.
 
+## Versioning
+
+AI-RECON follows Semantic Versioning.
+
+Version numbers use the format:
+
+MAJOR.MINOR.PATCH
+
+## MAJOR
+
+Increment the major version when introducing incompatible changes to public interfaces or expected behaviour.
+
+Examples include:
+
+* breaking CLI changes
+* incompatible changes to public Python APIs
+* removal of supported functionality
+* major architectural changes that require users to change their integration
+
+## MINOR
+
+Increment the minor version when adding backwards-compatible functionality.
+
+Examples include:
+
+* new collectors
+* new analyzers
+* new reporting capabilities
+* new CLI features
+* backwards-compatible configuration options
+
+## PATCH
+
+Increment the patch version for backwards-compatible bug fixes and small improvements.
+
+Examples include:
+
+* bug fixes
+* analyzer corrections
+* reporting fixes
+* documentation corrections
+* dependency or packaging fixes that do not introduce new functionality
+
+## Release Process
+
+The package version is defined in pyproject.toml.
+
+Before creating a release:
+
+1. Update the version in pyproject.toml.
+2. Move relevant changes from the Unreleased section of CHANGELOG.md into a new version section.
+3. Run the complete validation suite.
+4. Verify that the package builds successfully.
+5. Create a Git commit for the release.
+6. Create an annotated Git tag matching the version.
+7. Push the release commit and tag.
+
+Example for version 0.2.1:
+
+git checkout main
+git pull origin main
+
+# Update pyproject.toml and CHANGELOG.md
+
+ruff check .
+ruff format --check .
+mypy src
+pytest -v
+
+python -m build
+
+git add pyproject.toml CHANGELOG.md
+git commit -m "chore(release): prepare v0.2.1"
+
+git tag -a v0.2.1 -m "Release v0.2.1"
+
+git push origin main
+git push origin v0.2.1
+
+Release tags should use the format:
+
+vMAJOR.MINOR.PATCH
+
+For example:
+v0.2.0
+v0.2.1
+v0.3.0
+v1.0.0
+
 ## Responsible Contributions
 
 AI-RECON is intended for authorized security assessments.
@@ -110,8 +213,8 @@ Before opening a pull request:
 1. Keep changes focused.
 2. Add or update tests where appropriate.
 3. Update documentation when behaviour changes.
-4. Run the full validation suite.
-5. Clearly describe the purpose of the change.
+4. Update CHANGELOG.md when user-visible behaviour changes.
+5. Run the full validation suite.
+6. Clearly describe the purpose of the change.
 
 Small, well-scoped pull requests are preferred over large unrelated changes.
-

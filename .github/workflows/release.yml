@@ -1,0 +1,58 @@
+name: Release Validation
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-release:
+    name: Validate Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install development dependencies
+        run: python -m pip install -e ".[dev]" build
+
+      - name: Run Ruff
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Run type checks
+        run: mypy src
+
+      - name: Run tests
+        run: pytest -v
+
+      - name: Clean previous build artifacts
+        run: rm -rf build dist
+
+      - name: Build package
+        run: python -m build
+
+      - name: Create clean validation environment
+        run: python -m venv .release-venv
+
+      - name: Install built distribution
+        run: |
+          .release-venv/bin/python -m pip install --upgrade pip
+          .release-venv/bin/python -m pip install dist/*.whl
+
+      - name: Verify package import
+        run: |
+          .release-venv/bin/python -c "import ai_recon; print('Package import successful')"

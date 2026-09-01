@@ -10,7 +10,7 @@ If you are using an older version, please upgrade to the latest available releas
 
 If you discover a security vulnerability in AI-RECON, please do not report it through a public GitHub issue.
 
-Instead, contact the project maintainer privately with:
+Instead, report the vulnerability privately using GitHub's Private Vulnerability Reporting feature for this repository.
 
 * a description of the vulnerability
 * the affected version or commit

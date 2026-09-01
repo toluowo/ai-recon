@@ -12,7 +12,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ai-recon",
         description=(
-            "AI-assisted reconnaissance and exposure analysis for authorized security assessments."
+            "Modular reconnaissance and exposure analysis for authorized security assessments."
         ),
     )
 

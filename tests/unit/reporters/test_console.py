@@ -123,13 +123,9 @@ def test_render_orders_findings_by_severity() -> None:
 
     result = reporter.render(assessment)
 
-    critical_position = result.index(
-        "[CRITICAL] CRITICAL-001"
-    )
+    critical_position = result.index("[CRITICAL] CRITICAL-001")
 
-    low_position = result.index(
-        "[LOW] LOW-001"
-    )
+    low_position = result.index("[LOW] LOW-001")
 
     assert critical_position < low_position
 
@@ -170,9 +166,7 @@ def test_render_includes_finding_details() -> None:
 def test_render_includes_analysis() -> None:
     assessment = make_assessment()
 
-    assessment.analysis = (
-        "External exposure requires further review."
-    )
+    assessment.analysis = "External exposure requires further review."
 
     reporter = ConsoleReporter()
 
@@ -180,7 +174,4 @@ def test_render_includes_analysis() -> None:
 
     assert "ANALYSIS" in result
 
-    assert (
-        "External exposure requires further review."
-        in result
-    )
+    assert "External exposure requires further review." in result

@@ -38,31 +38,15 @@ class WhoisCollector(EvidenceCollector):
             )
 
         observations = {
-            "domain_name": self._normalize(
-                getattr(result, "domain_name", None)
-            )
+            "domain_name": self._normalize(getattr(result, "domain_name", None))
             or target.identifier,
-            "registrar": self._normalize(
-                getattr(result, "registrar", None)
-            ),
-            "creation_date": self._normalize(
-                getattr(result, "creation_date", None)
-            ),
-            "expiration_date": self._normalize(
-                getattr(result, "expiration_date", None)
-            ),
-            "name_servers": self._normalize_collection(
-                getattr(result, "name_servers", None)
-            ),
-            "emails": self._normalize(
-                getattr(result, "emails", None)
-            ),
-            "org": self._normalize(
-                getattr(result, "org", None)
-            ),
-            "country": self._normalize(
-                getattr(result, "country", None)
-            ),
+            "registrar": self._normalize(getattr(result, "registrar", None)),
+            "creation_date": self._normalize(getattr(result, "creation_date", None)),
+            "expiration_date": self._normalize(getattr(result, "expiration_date", None)),
+            "name_servers": self._normalize_collection(getattr(result, "name_servers", None)),
+            "emails": self._normalize(getattr(result, "emails", None)),
+            "org": self._normalize(getattr(result, "org", None)),
+            "country": self._normalize(getattr(result, "country", None)),
         }
 
         return Evidence(

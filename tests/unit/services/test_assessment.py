@@ -51,11 +51,7 @@ class FakeCollector(EvidenceCollector):
             },
             mode=EvidenceMode.LIVE,
             status=self.status,
-            error=(
-                "Collection failed."
-                if self.status == EvidenceStatus.ERROR
-                else None
-            ),
+            error=("Collection failed." if self.status == EvidenceStatus.ERROR else None),
         )
 
 
@@ -189,9 +185,7 @@ def test_collect_evidence_preserves_error_evidence() -> None:
 def test_analyze_evidence_executes_matching_analyzer() -> None:
     finding = make_finding()
 
-    analyzer = FakeAnalyzer(
-        [finding]
-    )
+    analyzer = FakeAnalyzer([finding])
 
     service = AssessmentService(
         analyzers=[
@@ -243,13 +237,9 @@ def test_analyze_evidence_ignores_non_matching_analyzer() -> None:
 
 
 def test_analyze_evidence_adds_all_findings() -> None:
-    first_finding = make_finding(
-        "TEST-001"
-    )
+    first_finding = make_finding("TEST-001")
 
-    second_finding = make_finding(
-        "TEST-002"
-    )
+    second_finding = make_finding("TEST-002")
 
     analyzer = FakeAnalyzer(
         [
@@ -298,13 +288,9 @@ def test_analyze_evidence_allows_empty_analyzer_configuration() -> None:
 def test_run_executes_collection_and_analysis_workflow() -> None:
     finding = make_finding()
 
-    collector = FakeCollector(
-        "whois"
-    )
+    collector = FakeCollector("whois")
 
-    analyzer = FakeAnalyzer(
-        [finding]
-    )
+    analyzer = FakeAnalyzer([finding])
 
     service = AssessmentService(
         collectors=[
@@ -315,9 +301,7 @@ def test_run_executes_collection_and_analysis_workflow() -> None:
         ],
     )
 
-    target = Target(
-        identifier="example.com"
-    )
+    target = Target(identifier="example.com")
 
     assessment = service.run(target)
 

@@ -15,9 +15,7 @@ class WhoisAnalyzer(EvidenceAnalyzer):
         if evidence.source != self.source:
             return []
 
-        name_servers = self._as_string_list(
-            evidence.observations.get("name_servers")
-        )
+        name_servers = self._as_string_list(evidence.observations.get("name_servers"))
 
         if not self._has_single_provider_dns(name_servers):
             return []
@@ -51,11 +49,7 @@ class WhoisAnalyzer(EvidenceAnalyzer):
         if not isinstance(value, list):
             return []
 
-        return [
-            item
-            for item in value
-            if isinstance(item, str)
-        ]
+        return [item for item in value if isinstance(item, str)]
 
     @staticmethod
     def _has_single_provider_dns(
@@ -67,9 +61,7 @@ class WhoisAnalyzer(EvidenceAnalyzer):
             return False
 
         providers = {
-            ".".join(
-                name_server.lower().split(".")[-2:]
-            )
+            ".".join(name_server.lower().split(".")[-2:])
             for name_server in name_servers
             if "." in name_server
         }

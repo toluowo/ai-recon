@@ -112,10 +112,7 @@ class ShodanCollector(EvidenceCollector):
             match_hostnames = match.get("hostnames")
 
             if isinstance(match_hostnames, list):
-                hostnames.update(
-                    str(hostname)
-                    for hostname in match_hostnames
-                )
+                hostnames.update(str(hostname) for hostname in match_hostnames)
 
             match_org = match.get("org")
 
@@ -133,10 +130,7 @@ class ShodanCollector(EvidenceCollector):
             vulnerabilities_data = match.get("vulns", {})
 
             if isinstance(vulnerabilities_data, dict):
-                vulnerabilities.update(
-                    str(vulnerability)
-                    for vulnerability in vulnerabilities_data
-                )
+                vulnerabilities.update(str(vulnerability) for vulnerability in vulnerabilities_data)
 
             banner = match.get("data")
 

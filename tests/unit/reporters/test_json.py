@@ -68,9 +68,7 @@ def test_render_includes_evidence() -> None:
 
     reporter = JsonReporter()
 
-    payload = json.loads(
-        reporter.render(assessment)
-    )
+    payload = json.loads(reporter.render(assessment))
 
     assert len(payload["evidence"]) == 1
 
@@ -108,14 +106,9 @@ def test_render_orders_findings_by_severity() -> None:
 
     reporter = JsonReporter()
 
-    payload = json.loads(
-        reporter.render(assessment)
-    )
+    payload = json.loads(reporter.render(assessment))
 
-    assert [
-        finding["id"]
-        for finding in payload["findings"]
-    ] == [
+    assert [finding["id"] for finding in payload["findings"]] == [
         "HIGH-001",
         "LOW-001",
     ]
@@ -137,30 +130,20 @@ def test_render_includes_collection_errors() -> None:
 
     reporter = JsonReporter()
 
-    payload = json.loads(
-        reporter.render(assessment)
-    )
+    payload = json.loads(reporter.render(assessment))
 
     assert payload["has_collection_errors"] is True
 
-    assert payload["evidence"][0]["error"] == (
-        "API request failed."
-    )
+    assert payload["evidence"][0]["error"] == ("API request failed.")
 
 
 def test_render_includes_analysis() -> None:
     assessment = make_assessment()
 
-    assessment.analysis = (
-        "The target has externally exposed services."
-    )
+    assessment.analysis = "The target has externally exposed services."
 
     reporter = JsonReporter()
 
-    payload = json.loads(
-        reporter.render(assessment)
-    )
+    payload = json.loads(reporter.render(assessment))
 
-    assert payload["analysis"] == (
-        "The target has externally exposed services."
-    )
+    assert payload["analysis"] == ("The target has externally exposed services.")

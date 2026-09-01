@@ -25,9 +25,7 @@ class Evidence:
     observations: dict[str, Any]
     mode: EvidenceMode
     status: EvidenceStatus = EvidenceStatus.SUCCESS
-    collected_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    collected_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     error: str | None = None
 
     def __post_init__(self) -> None:
@@ -38,6 +36,4 @@ class Evidence:
             raise ValueError("Evidence target must not be empty.")
 
         if self.status == EvidenceStatus.ERROR and not self.error:
-            raise ValueError(
-                "Error evidence must include an error description."
-            )
+            raise ValueError("Error evidence must include an error description.")

@@ -13,9 +13,7 @@ class Assessment:
     target: Target
     evidence: list[Evidence] = field(default_factory=list)
     findings: list[Finding] = field(default_factory=list)
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     analysis: str | None = None
 
     def add_evidence(self, item: Evidence) -> None:
@@ -26,7 +24,4 @@ class Assessment:
 
     @property
     def has_collection_errors(self) -> bool:
-        return any(
-            item.status == EvidenceStatus.ERROR
-            for item in self.evidence
-        )
+        return any(item.status == EvidenceStatus.ERROR for item in self.evidence)

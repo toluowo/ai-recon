@@ -1,11 +1,10 @@
-# .github/workflows/ci.yml
 name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   test:
@@ -23,16 +22,22 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -e ".[dev]"
 
-      - name: Run recon_ai in mock-only mode
+      - name: Run Ruff
         run: |
-          # run against example.com without API keys, should still generate a report
-          mkdir -p reports
-          python recon_ai.py --domain example.com --summary --score --pretext --company "Example Inc." --output reports/example.com_report.md
+          ruff check .
+          ruff format --check .
 
-      - name: Upload report artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: recon-report
-          path: reports/example.com_report.md
+      - name: Run type checks
+        run: mypy src
+
+      - name: Run tests
+        run: pytest -v
+
+      - name: Smoke test CLI
+        run: |
+          ai-recon \
+            --target example.com \
+            --authorized \
+            --format json

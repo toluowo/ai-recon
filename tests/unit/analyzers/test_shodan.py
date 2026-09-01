@@ -87,10 +87,7 @@ def test_analyze_returns_legacy_banner_finding() -> None:
         observations={
             "data": [
                 {
-                    "banner": (
-                        "HTTP/1.1 200 OK\n"
-                        "Server: Apache/2.2.34"
-                    ),
+                    "banner": ("HTTP/1.1 200 OK\nServer: Apache/2.2.34"),
                 },
             ],
         },
@@ -145,10 +142,7 @@ def test_analyze_can_return_multiple_findings() -> None:
 
     findings = ShodanAnalyzer().analyze(evidence)
 
-    finding_ids = {
-        finding.id
-        for finding in findings
-    }
+    finding_ids = {finding.id for finding in findings}
 
     assert finding_ids == {
         "SHODAN_EXPOSED_REMOTE_ACCESS",

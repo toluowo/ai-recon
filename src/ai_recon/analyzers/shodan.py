@@ -33,23 +33,13 @@ class ShodanAnalyzer(EvidenceAnalyzer):
 
         observations = evidence.observations
 
-        ports = self._as_int_list(
-            observations.get("ports")
-        )
+        ports = self._as_int_list(observations.get("ports"))
 
-        vulnerabilities = self._as_string_list(
-            observations.get("vulnerabilities")
-        )
+        vulnerabilities = self._as_string_list(observations.get("vulnerabilities"))
 
-        banners = self._as_banner_list(
-            observations.get("data")
-        )
+        banners = self._as_banner_list(observations.get("data"))
 
-        remote_access_ports = [
-            port
-            for port in ports
-            if port in self.REMOTE_ACCESS_PORTS
-        ]
+        remote_access_ports = [port for port in ports if port in self.REMOTE_ACCESS_PORTS]
 
         if remote_access_ports:
             findings.append(
@@ -64,10 +54,7 @@ class ShodanAnalyzer(EvidenceAnalyzer):
                         "ports."
                     ),
                     source=evidence.source,
-                    evidence_references=[
-                        str(port)
-                        for port in remote_access_ports
-                    ],
+                    evidence_references=[str(port) for port in remote_access_ports],
                     remediation=(
                         "Verify that remote access services are "
                         "intentionally internet-facing. Restrict access "
@@ -91,10 +78,7 @@ class ShodanAnalyzer(EvidenceAnalyzer):
                         "can increase attack surface."
                     ),
                     source=evidence.source,
-                    evidence_references=[
-                        str(port)
-                        for port in ports
-                    ],
+                    evidence_references=[str(port) for port in ports],
                     remediation=(
                         "Review exposed services and close or restrict "
                         "ports that are not required for the intended "
@@ -161,11 +145,7 @@ class ShodanAnalyzer(EvidenceAnalyzer):
         if not isinstance(value, list):
             return []
 
-        return [
-            item
-            for item in value
-            if isinstance(item, int)
-        ]
+        return [item for item in value if isinstance(item, int)]
 
     @staticmethod
     def _as_string_list(value: object) -> list[str]:
@@ -174,11 +154,7 @@ class ShodanAnalyzer(EvidenceAnalyzer):
         if not isinstance(value, list):
             return []
 
-        return [
-            item
-            for item in value
-            if isinstance(item, str)
-        ]
+        return [item for item in value if isinstance(item, str)]
 
     @staticmethod
     def _as_banner_list(value: object) -> list[str]:
@@ -211,10 +187,7 @@ class ShodanAnalyzer(EvidenceAnalyzer):
         for banner in banners:
             normalized = banner.lower()
 
-            if any(
-                indicator in normalized
-                for indicator in self.LEGACY_BANNER_INDICATORS
-            ):
+            if any(indicator in normalized for indicator in self.LEGACY_BANNER_INDICATORS):
                 matches.append(banner)
 
         return matches

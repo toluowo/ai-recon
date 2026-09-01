@@ -66,9 +66,7 @@ class ConsoleReporter(AssessmentReporter):
 
         if findings:
             for finding in findings:
-                lines.extend(
-                    self._render_finding(finding)
-                )
+                lines.extend(self._render_finding(finding))
         else:
             lines.append("No security findings identified.")
 
@@ -92,10 +90,7 @@ class ConsoleReporter(AssessmentReporter):
 
         lines = [
             "",
-            (
-                f"[{finding.severity.value.upper()}] "
-                f"{finding.id}"
-            ),
+            (f"[{finding.severity.value.upper()}] {finding.id}"),
             finding.title,
             f"Source: {finding.source}",
             f"Confidence: {finding.confidence.value.upper()}",
@@ -111,10 +106,7 @@ class ConsoleReporter(AssessmentReporter):
                 ]
             )
 
-            lines.extend(
-                f"- {reference}"
-                for reference in finding.evidence_references
-            )
+            lines.extend(f"- {reference}" for reference in finding.evidence_references)
 
         if finding.remediation:
             lines.extend(

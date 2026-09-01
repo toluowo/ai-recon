@@ -1,6 +1,6 @@
 # AI-RECON
 
-> AI-assisted reconnaissance and external exposure analysis for authorized security assessments.
+> Extensible reconnaissance and external exposure analysis for authorized security assessments.
 
 AI-RECON is a Python-based security assessment tool designed to collect external reconnaissance evidence, normalize the results, analyze observable exposure patterns, and present structured security findings.
 
@@ -211,7 +211,7 @@ EVIDENCE
 [SUCCESS] WHOIS (live)
 
 [UNAVAILABLE] SHODAN (live)
-  Error: SHODAN_API_KEY is not configured.
+  Error: AI_RECON_SHODAN_API_KEY is not configured.
 
 FINDINGS
 --------
@@ -279,7 +279,7 @@ If no Shodan API key is configured, AI-RECON continues the assessment and report
 Configure your API key through the environment:
 
 ```bash
-export SHODAN_API_KEY="your_api_key"
+export AI_RECON_SHODAN_API_KEY="your_api_key"
 ```
 
 Then run an assessment normally:

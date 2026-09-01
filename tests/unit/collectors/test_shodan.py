@@ -16,7 +16,7 @@ def test_collect_returns_unavailable_when_api_key_is_missing() -> None:
     assert evidence.mode is EvidenceMode.LIVE
     assert evidence.status is EvidenceStatus.UNAVAILABLE
     assert evidence.observations == {}
-    assert evidence.error == "SHODAN_API_KEY is not configured."
+    assert evidence.error == "AI_RECON_SHODAN_API_KEY is not configured."
 
 
 def test_collect_returns_normalized_live_evidence() -> None:

@@ -34,7 +34,7 @@ class ShodanCollector(EvidenceCollector):
                 observations={},
                 mode=EvidenceMode.LIVE,
                 status=EvidenceStatus.UNAVAILABLE,
-                error="SHODAN_API_KEY is not configured.",
+                error="AI_RECON_SHODAN_API_KEY is not configured.",
             )
 
         try:
@@ -71,7 +71,7 @@ class ShodanCollector(EvidenceCollector):
             return self._search(identifier)
 
         if self._api_key is None:
-            raise RuntimeError("SHODAN_API_KEY is not configured.")
+            raise RuntimeError("AI_RECON_SHODAN_API_KEY is not configured.")
 
         api = shodan.Shodan(self._api_key)
 

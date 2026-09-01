@@ -1,5 +1,10 @@
 # AI-RECON
 
+[![CI](https://github.com/toluowo/ai-recon/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/toluowo/ai-recon/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue.svg)](https://www.python.org/)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/toluowo/ai-recon/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 > Extensible reconnaissance and external exposure analysis for authorized security assessments.
 
 AI-RECON is a Python-based security assessment tool designed to collect external reconnaissance evidence, normalize the results, analyze observable exposure patterns, and present structured security findings.

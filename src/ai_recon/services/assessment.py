@@ -39,7 +39,7 @@ class AssessmentService:
         self,
         assessment: Assessment,
     ) -> Assessment:
-        """Analyze collected evidence with matching analyzers."""
+        """Analyze collected evidence and add findings to the assessment."""
 
         for evidence in assessment.evidence:
             for analyzer in self._analyzers:
@@ -50,5 +50,18 @@ class AssessmentService:
 
                 for finding in findings:
                     assessment.add_finding(finding)
+
+        return assessment
+
+    def run(
+        self,
+        target: Target,
+    ) -> Assessment:
+        """Run the complete collection and analysis workflow."""
+
+        assessment = self.create_assessment(target)
+
+        self.collect_evidence(assessment)
+        self.analyze_evidence(assessment)
 
         return assessment

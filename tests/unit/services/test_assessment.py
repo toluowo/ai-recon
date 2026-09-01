@@ -26,18 +26,6 @@ def make_finding(identifier: str = "TEST-001") -> Finding:
     )
 
 
-def make_whois_evidence() -> Evidence:
-    return Evidence(
-        source="whois",
-        target="example.com",
-        mode=EvidenceMode.LIVE,
-        status=EvidenceStatus.SUCCESS,
-        observations={
-            "domain_name": ["example.com"],
-        },
-    )
-
-
 class FakeCollector(EvidenceCollector):
     """Test collector that records the targets it receives."""
 
@@ -58,7 +46,9 @@ class FakeCollector(EvidenceCollector):
         return Evidence(
             source=self.source,
             target=target.identifier,
-            observations={"collector": self.source},
+            observations={
+                "collector": self.source,
+            },
             mode=EvidenceMode.LIVE,
             status=self.status,
             error=(
@@ -70,34 +60,54 @@ class FakeCollector(EvidenceCollector):
 
 
 class FakeAnalyzer(EvidenceAnalyzer):
-    """Test analyzer that returns predefined findings."""
-
     source = "whois"
 
-    def __init__(self, findings: list[Finding]) -> None:
+    def __init__(
+        self,
+        findings: list[Finding],
+    ) -> None:
         self.findings = findings
         self.calls: list[Evidence] = []
 
-    def analyze(self, evidence: Evidence) -> list[Finding]:
+    def analyze(
+        self,
+        evidence: Evidence,
+    ) -> list[Finding]:
         self.calls.append(evidence)
         return self.findings
 
 
 class NonMatchingAnalyzer(EvidenceAnalyzer):
-    """Analyzer intentionally configured for another evidence source."""
-
     source = "shodan"
 
     def __init__(self) -> None:
         self.calls: list[Evidence] = []
 
-    def analyze(self, evidence: Evidence) -> list[Finding]:
+    def analyze(
+        self,
+        evidence: Evidence,
+    ) -> list[Finding]:
         self.calls.append(evidence)
         return []
 
 
+def make_whois_evidence() -> Evidence:
+    return Evidence(
+        source="whois",
+        target="example.com",
+        mode=EvidenceMode.LIVE,
+        status=EvidenceStatus.SUCCESS,
+        observations={
+            "domain_name": [
+                "example.com",
+            ],
+        },
+    )
+
+
 def test_create_assessment_returns_assessment_for_target() -> None:
     target = Target(identifier="example.com")
+
     service = AssessmentService()
 
     assessment = service.create_assessment(target)
@@ -122,6 +132,7 @@ def test_collect_evidence_executes_all_collectors() -> None:
     )
 
     assessment = service.create_assessment(target)
+
     result = service.collect_evidence(assessment)
 
     assert result is assessment
@@ -137,9 +148,11 @@ def test_collect_evidence_executes_all_collectors() -> None:
 
 def test_collect_evidence_allows_empty_collector_configuration() -> None:
     target = Target(identifier="example.com")
+
     service = AssessmentService()
 
     assessment = service.create_assessment(target)
+
     result = service.collect_evidence(assessment)
 
     assert result is assessment
@@ -155,10 +168,13 @@ def test_collect_evidence_preserves_error_evidence() -> None:
     )
 
     service = AssessmentService(
-        collectors=[failing_collector]
+        collectors=[
+            failing_collector,
+        ]
     )
 
     assessment = service.create_assessment(target)
+
     service.collect_evidence(assessment)
 
     assert len(assessment.evidence) == 1
@@ -172,30 +188,51 @@ def test_collect_evidence_preserves_error_evidence() -> None:
 
 def test_analyze_evidence_executes_matching_analyzer() -> None:
     finding = make_finding()
-    analyzer = FakeAnalyzer([finding])
 
-    service = AssessmentService(analyzers=[analyzer])
+    analyzer = FakeAnalyzer(
+        [finding]
+    )
+
+    service = AssessmentService(
+        analyzers=[
+            analyzer,
+        ]
+    )
 
     assessment = Assessment(
         target=Target(identifier="example.com"),
-        evidence=[make_whois_evidence()],
+        evidence=[
+            make_whois_evidence(),
+        ],
     )
 
     result = service.analyze_evidence(assessment)
 
     assert result is assessment
-    assert analyzer.calls == [assessment.evidence[0]]
-    assert assessment.findings == [finding]
+
+    assert analyzer.calls == [
+        assessment.evidence[0],
+    ]
+
+    assert assessment.findings == [
+        finding,
+    ]
 
 
 def test_analyze_evidence_ignores_non_matching_analyzer() -> None:
     analyzer = NonMatchingAnalyzer()
 
-    service = AssessmentService(analyzers=[analyzer])
+    service = AssessmentService(
+        analyzers=[
+            analyzer,
+        ]
+    )
 
     assessment = Assessment(
         target=Target(identifier="example.com"),
-        evidence=[make_whois_evidence()],
+        evidence=[
+            make_whois_evidence(),
+        ],
     )
 
     result = service.analyze_evidence(assessment)
@@ -206,8 +243,13 @@ def test_analyze_evidence_ignores_non_matching_analyzer() -> None:
 
 
 def test_analyze_evidence_adds_all_findings() -> None:
-    first_finding = make_finding("TEST-001")
-    second_finding = make_finding("TEST-002")
+    first_finding = make_finding(
+        "TEST-001"
+    )
+
+    second_finding = make_finding(
+        "TEST-002"
+    )
 
     analyzer = FakeAnalyzer(
         [
@@ -216,11 +258,17 @@ def test_analyze_evidence_adds_all_findings() -> None:
         ]
     )
 
-    service = AssessmentService(analyzers=[analyzer])
+    service = AssessmentService(
+        analyzers=[
+            analyzer,
+        ]
+    )
 
     assessment = Assessment(
         target=Target(identifier="example.com"),
-        evidence=[make_whois_evidence()],
+        evidence=[
+            make_whois_evidence(),
+        ],
     )
 
     service.analyze_evidence(assessment)
@@ -236,10 +284,53 @@ def test_analyze_evidence_allows_empty_analyzer_configuration() -> None:
 
     assessment = Assessment(
         target=Target(identifier="example.com"),
-        evidence=[make_whois_evidence()],
+        evidence=[
+            make_whois_evidence(),
+        ],
     )
 
     result = service.analyze_evidence(assessment)
 
     assert result is assessment
     assert assessment.findings == []
+
+
+def test_run_executes_collection_and_analysis_workflow() -> None:
+    finding = make_finding()
+
+    collector = FakeCollector(
+        "whois"
+    )
+
+    analyzer = FakeAnalyzer(
+        [finding]
+    )
+
+    service = AssessmentService(
+        collectors=[
+            collector,
+        ],
+        analyzers=[
+            analyzer,
+        ],
+    )
+
+    target = Target(
+        identifier="example.com"
+    )
+
+    assessment = service.run(target)
+
+    assert assessment.target == target
+
+    assert len(assessment.evidence) == 1
+
+    assert assessment.evidence[0].source == "whois"
+
+    assert analyzer.calls == [
+        assessment.evidence[0],
+    ]
+
+    assert assessment.findings == [
+        finding,
+    ]

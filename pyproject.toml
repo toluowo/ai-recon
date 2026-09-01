@@ -5,10 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ai-recon"
 version = "0.2.0"
-description = "AI-assisted reconnaissance and external exposure analysis for authorized security assessments"
+description = "Modular reconnaissance and external exposure analysis for authorized security assessments"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 
 authors = [
     { name = "Toluwalase Owolabi" }

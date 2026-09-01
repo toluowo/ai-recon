@@ -146,7 +146,7 @@ This separation makes it easier to add new reconnaissance sources, analysis rule
 ## Clone the Repository
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/toluowo/ai-recon.git
 cd ai-recon
 ```
 
@@ -367,7 +367,7 @@ Pytest
 CLI smoke test
 ```
 
-The CI workflow uses Python 3.11.
+The CI workflow validates the project across Python 3.10, Python 3.11, and Python 3.12.
 
 The CLI smoke test verifies that the installed application can execute an authorized assessment successfully.
 
@@ -379,7 +379,8 @@ The CLI smoke test verifies that the installed application can execute an author
 ai-recon/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml
+│       ├── ci.yml
+│       └── release.yml
 │
 ├── src/
 │   └── ai_recon/

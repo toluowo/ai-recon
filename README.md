@@ -5,194 +5,130 @@
 [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/toluowo/ai-recon/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-> Extensible reconnaissance and external exposure analysis for authorized security assessments.
+> Evidence-driven reconnaissance and external exposure analysis for authorized security assessments.
 
-AI-RECON is a Python-based security assessment tool designed to collect external reconnaissance evidence, normalize the results, analyze observable exposure patterns, and present structured security findings.
+AI-RECON is a modular Python security-assessment tool that collects externally observable evidence, normalizes it into security-domain models, analyzes exposure patterns, and produces structured findings with severity, confidence, evidence references, and remediation guidance.
 
-The project is built around a modular architecture that separates:
+The project demonstrates security-engineering practices across **collection, analysis, reporting, testing, packaging, and CI validation**.
 
-* target definition
-* evidence collection
-* evidence analysis
-* finding generation
-* reporting
-* application orchestration
-
-AI-RECON is intended for **authorized security assessments only**.
+**AI-RECON is intended for authorized security assessments only.**
 
 ---
 
-## Features
+## Why AI-RECON?
 
-### Evidence Collection
+Security assessments often produce fragmented reconnaissance data. AI-RECON turns that data into a repeatable workflow:
 
-AI-RECON currently supports external evidence collection from:
+```text
+Collect → Normalize → Analyze → Prioritize → Report
+```
 
-* **WHOIS**
+The architecture separates evidence collection from analysis and reporting so that new intelligence sources, detection rules, and output formats can be added without tightly coupling the application.
 
-  * domain registration information
-  * authoritative name servers
-  * DNS-related metadata
+## Current Capabilities
 
-* **Shodan**
+### Evidence collection
 
-  * externally observable services
-  * exposed ports
-  * service banners
-  * available vulnerability information
+**WHOIS**
+- Domain registration metadata
+- Authoritative name servers
+- DNS-related information
 
-Shodan integration is optional. The application continues running when a Shodan API key is not configured.
+**Shodan**
+- Externally observable services
+- Exposed ports
+- Service banners
+- Available vulnerability metadata
 
-### Evidence Analysis
+Shodan is optional. If its API key is unavailable, the assessment continues and records the integration as unavailable.
 
-Collected evidence is passed through analyzers that convert observable patterns into structured security findings.
+### Exposure analysis
 
-Current examples include:
+Current analyzers identify patterns such as:
 
-* potential single-provider DNS footprint
-* remotely accessible services
-* known vulnerability exposure
-* large externally exposed port footprints
-* potentially legacy service banners
+- Potential single-provider DNS footprints
+- Remotely accessible services
+- Known vulnerability exposure
+- Large externally exposed port footprints
+- Potentially legacy service banners
 
-Findings include structured information such as:
+Findings include:
 
-* severity
-* title
-* source
-* confidence
-* description
-* evidence references
-* remediation guidance
+- Severity
+- Confidence
+- Source
+- Description
+- Evidence references
+- Remediation guidance
 
 ### Reporting
 
-AI-RECON supports:
+```text
+Console → human-readable assessment
+JSON    → automation / downstream security workflows
+```
 
-* human-readable console reports
-* structured JSON output
-
-Findings are ordered by severity to make higher-priority issues easier to identify.
-
-### Engineering Quality
-
-The project includes:
-
-* `src/`-based Python package structure
-* automated unit tests
-* strict MyPy type checking
-* Ruff linting
-* Ruff formatting
-* GitHub Actions CI
-* CLI smoke testing
+JSON output can be consumed by scripts, CI/CD workflows, dashboards, or future security integrations.
 
 ---
 
-# Architecture
-
-The application follows a layered design:
+## Architecture
 
 ```text
-                    ┌───────────────┐
-                    │      CLI      │
-                    └───────┬───────┘
-                            │
-                            ▼
-                    ┌───────────────┐
-                    │  Application  │
-                    │ Configuration │
-                    └───────┬───────┘
-                            │
-                            ▼
-                    ┌───────────────┐
-                    │  Assessment   │
-                    │    Service    │
-                    └───────┬───────┘
-                            │
-              ┌─────────────┴─────────────┐
-              ▼                           ▼
-       ┌───────────────┐           ┌───────────────┐
-       │  Collectors   │           │   Analyzers   │
-       │               │           │               │
-       │ • WHOIS       │           │ • WHOIS       │
-       │ • Shodan      │           │ • Shodan      │
-       └───────┬───────┘           └───────┬───────┘
-               │                           │
-               ▼                           ▼
-       ┌───────────────┐           ┌───────────────┐
-       │   Evidence    │──────────▶│   Findings    │
-       └───────────────┘           └───────┬───────┘
-                                           │
-                                           ▼
-                                   ┌───────────────┐
-                                   │   Reporters   │
-                                   │               │
-                                   │ • Console     │
-                                   │ • JSON        │
-                                   └───────────────┘
+                         Authorized Operator
+                                  |
+                                  v
+                         +------------------+
+                         |   CLI / Config   |
+                         +--------+---------+
+                                  |
+                                  v
+                         +------------------+
+                         | Assessment       |
+                         | Service          |
+                         +--------+---------+
+                                  |
+                    +-------------+-------------+
+                    |                           |
+                    v                           v
+             +-------------+             +-------------+
+             | WHOIS       |             | Shodan      |
+             | Collector   |             | Collector   |
+             +------+------+             +------+------+
+                    |                           |
+                    +-------------+-------------+
+                                  v
+                         +------------------+
+                         | Evidence Models |
+                         +--------+---------+
+                                  |
+                                  v
+                         +------------------+
+                         | Analyzers        |
+                         +--------+---------+
+                                  |
+                                  v
+                         +------------------+
+                         | Structured       |
+                         | Findings         |
+                         +--------+---------+
+                                  |
+                         +--------+--------+
+                         |                 |
+                         v                 v
+                  +-------------+   +-------------+
+                  | Console     |   | JSON        |
+                  | Reporter    |   | Reporter    |
+                  +-------------+   +-------------+
 ```
 
-This separation makes it easier to add new reconnaissance sources, analysis rules, and reporting formats without tightly coupling the components.
+See [`docs/SECURITY_ARCHITECTURE.md`](docs/SECURITY_ARCHITECTURE.md) for the security boundaries, trust model, data flow, and hardening considerations.
 
 ---
 
-# Installation
+## Example Assessment
 
-## Requirements
-
-* Python **3.10 or newer**
-* `pip`
-
-## Clone the Repository
-
-```bash
-git clone https://github.com/toluowo/ai-recon.git
-cd ai-recon
-```
-
-## Create and Activate a Virtual Environment
-
-### macOS / Linux
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### Windows
-
-```powershell
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-## Install AI-RECON
-
-For normal usage:
-
-```bash
-pip install .
-```
-
-For development:
-
-```bash
-pip install -e ".[dev]"
-```
-
-The development installation includes:
-
-* Pytest
-* Ruff
-* MyPy
-
----
-
-# Usage
-
-AI-RECON requires explicit confirmation that you are authorized to assess the target.
-
-## Basic Assessment
+Run an authorized assessment:
 
 ```bash
 ai-recon \
@@ -201,11 +137,11 @@ ai-recon \
   --format console
 ```
 
-Example output:
+Representative workflow:
 
 ```text
 AI-RECON SECURITY ASSESSMENT
-===========================
+============================
 
 Target: example.com
 Type: domain
@@ -226,37 +162,14 @@ FINDINGS
 Potential single-provider DNS footprint
 
 Source: whois
-
 Confidence: LOW
 ```
 
+The exact findings depend on the target and live evidence available at assessment time.
+
 ---
 
-# Output Formats
-
-## Console Output
-
-Use:
-
-```bash
-ai-recon \
-  --target example.com \
-  --authorized \
-  --format console
-```
-
-This produces a human-readable assessment containing:
-
-* target information
-* collected evidence
-* collection errors or unavailable integrations
-* findings
-* evidence references
-* remediation guidance
-
 ## JSON Output
-
-Use:
 
 ```bash
 ai-recon \
@@ -265,82 +178,67 @@ ai-recon \
   --format json
 ```
 
-JSON output is useful for:
+JSON is intended for:
 
-* automation
-* CI/CD workflows
-* downstream processing
-* dashboards
-* security workflow integrations
+- Automation
+- CI/CD security workflows
+- Dashboards
+- Downstream processing
+- Future security-tool integrations
+
+The structured model preserves the relationship between collected evidence and generated findings.
 
 ---
 
-# Shodan Configuration
+## Installation
 
-Shodan is an optional evidence source.
+### Requirements
 
-If no Shodan API key is configured, AI-RECON continues the assessment and reports Shodan as unavailable.
+- Python 3.10+
+- pip
 
-Configure your API key through the environment:
+### Clone
+
+```bash
+git clone https://github.com/toluowo/ai-recon.git
+cd ai-recon
+```
+
+### Install
+
+```bash
+pip install .
+```
+
+For development:
+
+```bash
+pip install -e ".[dev]"
+```
+
+Development dependencies include:
+
+- Pytest
+- Ruff
+- MyPy
+
+---
+
+## Shodan Configuration
+
+Shodan is optional.
 
 ```bash
 export AI_RECON_SHODAN_API_KEY="your_api_key"
 ```
 
-Then run an assessment normally:
-
-```bash
-ai-recon \
-  --target example.com \
-  --authorized \
-  --format console
-```
-
-> Never commit API keys or secrets to the repository.
+Never commit API keys or other secrets to the repository.
 
 ---
 
-# Development
+## Development Validation
 
-## Run Tests
-
-```bash
-pytest -v
-```
-
-## Run Ruff Linting
-
-```bash
-ruff check .
-```
-
-## Automatically Fix Supported Ruff Issues
-
-```bash
-ruff check . --fix
-```
-
-## Format the Codebase
-
-```bash
-ruff format .
-```
-
-## Verify Formatting
-
-```bash
-ruff format --check .
-```
-
-## Run Type Checking
-
-```bash
-mypy src
-```
-
-## Recommended Local Validation
-
-Before committing or pushing changes:
+Run the same quality checks used by CI:
 
 ```bash
 ruff check .
@@ -349,31 +247,59 @@ mypy src
 pytest -v
 ```
 
+The project also validates package creation and installation in a clean environment.
+
 ---
 
-# Continuous Integration
+## CI / Engineering Quality
 
-GitHub Actions runs the following checks:
+GitHub Actions validates the project across Python 3.10, 3.11, and 3.12.
 
 ```text
 Ruff linting
-        ↓
+      ↓
 Ruff formatting validation
-        ↓
+      ↓
 MyPy strict type checking
-        ↓
+      ↓
 Pytest
-        ↓
-CLI smoke test
+      ↓
+Package build
+      ↓
+Clean-environment installation
+      ↓
+Installed CLI smoke test
 ```
 
-The CI workflow validates the project across Python 3.10, Python 3.11, and Python 3.12.
-
-The CLI smoke test verifies that the installed application can execute an authorized assessment successfully.
+The release workflow additionally validates tagged releases before publication.
 
 ---
 
-# Project Structure
+## Security Engineering Principles
+
+### Explicit authorization
+
+The CLI requires an explicit authorization acknowledgement before an assessment runs.
+
+### Evidence before findings
+
+Findings are derived from normalized evidence rather than generated independently. This improves traceability and reviewability.
+
+### Separation of concerns
+
+Collectors, domain models, analyzers, services, and reporters have separate responsibilities.
+
+### Graceful integration failure
+
+Unavailable credentials, network failures, API failures, and optional integrations are represented explicitly rather than silently producing misleading results.
+
+### Secure credential handling
+
+External credentials are supplied through configuration/environment variables and are not stored in source control.
+
+---
+
+## Project Structure
 
 ```text
 ai-recon/
@@ -381,220 +307,97 @@ ai-recon/
 │   └── workflows/
 │       ├── ci.yml
 │       └── release.yml
-│
+├── docs/
+│   └── SECURITY_ARCHITECTURE.md
 ├── src/
 │   └── ai_recon/
 │       ├── analyzers/
-│       │   ├── shodan.py
-│       │   └── whois.py
-│       │
 │       ├── collectors/
-│       │   ├── shodan.py
-│       │   └── whois.py
-│       │
 │       ├── models/
-│       │   ├── assessment.py
-│       │   ├── evidence.py
-│       │   ├── finding.py
-│       │   └── target.py
-│       │
 │       ├── reporters/
-│       │   ├── console.py
-│       │   └── json.py
-│       │
 │       ├── services/
-│       │   └── assessment.py
-│       │
 │       ├── application.py
 │       └── cli.py
-│
 ├── tests/
 │   └── unit/
-│
 ├── .env.example
+├── CHANGELOG.md
 ├── LICENSE
 ├── pyproject.toml
+├── SECURITY.md
 └── README.md
 ```
 
 ---
 
-# Design Principles
+## Roadmap
 
-AI-RECON is being developed around several engineering principles.
+Potential future development includes:
 
-## Explicit Authorization
+- Additional reconnaissance collectors
+- Expanded exposure analysis
+- More finding rules
+- Additional output formats such as SARIF
+- Richer evidence provenance
+- Risk prioritization improvements
+- Security workflow integrations
+- Additional CI security gates
+- Broader test coverage
+- Containerized deployment
+- Optional evidence summarization with provenance preservation
 
-Security tooling should make authorization visible rather than implicit.
-
-The CLI therefore requires explicit authorization before an assessment is executed.
-
-## Separation of Concerns
-
-Collectors are responsible for obtaining and normalizing evidence.
-
-Analyzers are responsible for interpreting evidence and generating findings.
-
-Reporters are responsible for presenting the assessment.
-
-The assessment service orchestrates the workflow.
-
-## Evidence Before Findings
-
-Findings are derived from collected evidence rather than being generated independently.
-
-This improves traceability and makes it easier to understand why a finding was produced.
-
-## Graceful Integration Failure
-
-External integrations can fail because of:
-
-* missing credentials
-* network issues
-* API limits
-* service availability
-
-AI-RECON preserves these states as evidence instead of terminating the entire assessment unnecessarily.
-
-## Extensibility
-
-New functionality can be introduced by adding:
-
-* a collector for a new evidence source
-* an analyzer for that evidence type
-* additional finding logic
-* a reporter for another output format
-
-This allows the project to grow without requiring major changes to the core assessment workflow.
+AI-RECON is deliberately designed so these capabilities can be added without tightly coupling them to the existing assessment workflow.
 
 ---
 
-# Example Workflow
-
-```text
-Target
-   │
-   ▼
-Authorization Confirmation
-   │
-   ▼
-Assessment Service
-   │
-   ├──► WHOIS Collector
-   │         │
-   │         ▼
-   │      Evidence
-   │
-   ├──► Shodan Collector
-   │         │
-   │         ▼
-   │      Evidence
-   │
-   ▼
-Evidence Analysis
-   │
-   ├──► WHOIS Analyzer
-   │
-   └──► Shodan Analyzer
-   │
-   ▼
-Findings
-   │
-   ▼
-Reporter
-   │
-   ├──► Console
-   │
-   └──► JSON
-```
-
----
-
-# Roadmap
-
-Potential future development areas include:
-
-* additional reconnaissance collectors
-* richer exposure analysis
-* expanded finding rules
-* additional output formats
-* AI-assisted evidence summarization
-* risk prioritization improvements
-* automated security workflow integrations
-* additional CI quality gates
-* broader test coverage
-* containerized deployment
-
-The architecture is designed to support these additions without tightly coupling them to existing collectors or analyzers.
-
----
-
-# Responsible Use
+## Responsible Use
 
 AI-RECON is intended for:
 
-* authorized penetration testing
-* security assessments
-* asset exposure reviews
-* security research conducted with permission
-* testing systems you own or are explicitly authorized to assess
+- Authorized penetration testing
+- Security assessments
+- Asset exposure reviews
+- Security research conducted with permission
+- Testing systems you own or are explicitly authorized to assess
 
 Do not use this tool against systems without explicit authorization.
 
-Users are responsible for ensuring that their use of AI-RECON complies with applicable laws, contracts, and organizational policies.
+Users are responsible for ensuring their use of AI-RECON complies with applicable laws, contracts, and organizational policies.
 
 ---
 
-# License
+## Versioning
 
-This project is licensed under the terms of the included `LICENSE` file.
+AI-RECON follows Semantic Versioning.
 
----
-
-# Author
-
-**Toluwalase Owolabi**
-
-Cybersecurity professional focused on:
-
-* security operations
-* vulnerability management
-* offensive security
-* cloud security
-* security automation
-* AI security
-
----
-
-## Versioning and Releases
-
-AI-RECON follows [Semantic Versioning](https://semver.org/).
-
-Version numbers use the format:
+Current version:
 
 ```text
-MAJOR.MINOR.PATCH
+0.2.0
 ```
-Release changes are documented in CHANGELOG.md.
 
-Release tags use the format:
+Release tags use:
 
+```text
 vMAJOR.MINOR.PATCH
+```
 
 For example:
 
+```text
 v0.2.0
 v0.2.1
 v0.3.0
 v1.0.0
+```
 
-Tagged releases are automatically validated through the project's release workflow, including linting, formatting checks, type checking, automated tests, package building, and clean-environment installation verification.
+See [`CHANGELOG.md`](CHANGELOG.md) for release history.
+
+---
 
 ## Contributing
 
-Contributions, ideas, and feedback are welcome.
-
-Before submitting changes, please ensure:
+Before submitting changes:
 
 ```bash
 ruff check .
@@ -603,4 +406,24 @@ mypy src
 pytest -v
 ```
 
-all pass successfully.
+All checks should pass.
+
+---
+
+## License
+
+This project is licensed under the terms of the included `LICENSE` file.
+
+## Author
+
+**Toluwalase Owolabi**
+
+Cybersecurity professional focused on:
+
+- Security Operations
+- Security Engineering
+- Vulnerability Management
+- Offensive Security
+- Cloud Security
+- Security Automation
+- AI Security
